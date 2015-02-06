@@ -1,5 +1,8 @@
 from django.db import models
+from django.utils.html import format_html
 from tinymce import models as tinymce_models
+from django.core.urlresolvers import reverse
+
 
 class EntryQuerySet(models.QuerySet):
 
@@ -21,8 +24,15 @@ class Entry(models.Model):
     publish = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    tags = models.ManyToManyField(Tag)
 
     objects = EntryQuerySet.as_manager()
+
+    def get_absolute_url(self):
+        return reverse("entrada", kwargs={"slug": self.slug})
+
+    def body_html(self):
+        return format_html(self.body)
 
     def __unicode__(self):
         return self.title
